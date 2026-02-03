@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Relationship, ConstitutionType, MBTIType } from '../types';
 import { calculateCompatibility } from '../utils/compatibility';
 import { getCompatibilityFoods } from '../constants/foods';
-import { v4 as uuidv4 } from 'uuid';
+import { generateId } from '../utils/generateId';
 
 interface RelationshipState {
   relationships: Relationship[];
@@ -51,7 +51,7 @@ export const useRelationshipStore = create<RelationshipState>()(
         );
 
         const newRelationship: Relationship = {
-          id: uuidv4(),
+          id: generateId(),
           userId,
           partnerName,
           partnerBirthDate,

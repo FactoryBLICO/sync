@@ -3,7 +3,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Routine, RoutineTask, ConstitutionType, Badge } from '../types';
 import { ROUTINE_BY_CONSTITUTION, BADGES } from '../constants/routines';
-import { v4 as uuidv4 } from 'uuid';
+import { generateId } from '../utils/generateId';
 
 interface RoutineState {
   routines: Routine[];
@@ -46,7 +46,7 @@ export const useRoutineStore = create<RoutineState>()(
           }));
 
           todayRoutine = {
-            id: uuidv4(),
+            id: generateId(),
             userId,
             date: today,
             tasks,

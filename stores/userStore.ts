@@ -2,14 +2,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { User, OnboardingData, ConstitutionType, MBTIType } from '../types';
-
-// Simple UUID generator for React Native (no crypto.getRandomValues dependency)
-const generateUUID = (): string => {
-  const timestamp = Date.now().toString(36);
-  const randomPart = Math.random().toString(36).substring(2, 15);
-  const randomPart2 = Math.random().toString(36).substring(2, 15);
-  return `${timestamp}-${randomPart}-${randomPart2}`;
-};
+import { generateId } from '../utils/generateId';
 
 interface UserState {
   user: User | null;
@@ -54,7 +47,7 @@ export const useUserStore = create<UserState>()(
       completeOnboarding: () => {
         const { onboardingData } = get();
         const newUser: User = {
-          id: generateUUID(),
+          id: generateId(),
           nickname: onboardingData.nickname,
           birthDate: onboardingData.birthDate,
           birthTime: onboardingData.birthTime,

@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CheckIn, ChatMessage } from '../types';
-import { v4 as uuidv4 } from 'uuid';
+import { generateId } from '../utils/generateId';
 
 interface CheckInState {
   checkIns: CheckIn[];
@@ -27,7 +27,7 @@ export const useCheckInStore = create<CheckInState>()(
       startCheckIn: (userId, mood) => {
         const today = new Date().toISOString().split('T')[0];
         const newCheckIn: CheckIn = {
-          id: uuidv4(),
+          id: generateId(),
           userId,
           date: today,
           mood,
@@ -44,7 +44,7 @@ export const useCheckInStore = create<CheckInState>()(
 
       addMessage: (role, content) => {
         const message: ChatMessage = {
-          id: uuidv4(),
+          id: generateId(),
           role,
           content,
           timestamp: new Date().toISOString(),
