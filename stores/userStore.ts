@@ -78,16 +78,13 @@ export const useUserStore = create<UserState>()(
         });
       },
 
-      setHasHydrated: (state) => {
-        set({ _hasHydrated: state });
+      setHasHydrated: (hydrated) => {
+        set({ _hasHydrated: hydrated });
       },
     }),
     {
       name: 'sync-user-storage',
       storage: createJSONStorage(() => AsyncStorage),
-      onRehydrateStorage: () => (state) => {
-        state?.setHasHydrated(true);
-      },
       partialize: (state) => ({
         user: state.user,
         onboardingData: state.onboardingData,
@@ -96,3 +93,9 @@ export const useUserStore = create<UserState>()(
     }
   )
 );
+
+// Zustand v5: Set up hydration listener after store is created
+// This is the correct pattern - onRehydrateStorage callback may not have working actions
+useUserStore.persist.onFinishHydration(() => {
+  useUserStore.setState({ _hasHydrated: true });
+});
