@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -11,8 +11,14 @@ export default function CheckInResult() {
   const { user } = useUserStore();
   const { currentCheckIn, completeCheckIn, getStreak } = useCheckInStore();
 
+  // Redirect must be in useEffect, not during render
+  useEffect(() => {
+    if (!user || !currentCheckIn) {
+      router.replace('/(tabs)');
+    }
+  }, [user, currentCheckIn, router]);
+
   if (!user || !currentCheckIn) {
-    router.replace('/(tabs)');
     return null;
   }
 

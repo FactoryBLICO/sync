@@ -26,15 +26,12 @@ export default function CheckInChat() {
   const [inputText, setInputText] = useState('');
   const [chatStep, setChatStep] = useState(0);
 
-  if (!user || !currentCheckIn) {
-    router.replace('/checkin');
-    return null;
-  }
-
-  const tone = getMBTITone(user.mbti as MBTIType);
-  const foodInfo = FOODS_BY_CONSTITUTION[user.constitution];
+  const tone = user ? getMBTITone(user.mbti as MBTIType) : null;
+  const foodInfo = user ? FOODS_BY_CONSTITUTION[user.constitution] : null;
 
   const getAIResponse = (step: number, userMessage?: string) => {
+    if (!user || !currentCheckIn || !tone || !foodInfo) return '';
+
     const moodText = {
       good: '좋다니',
       neutral: '보통이군요',
@@ -65,16 +62,30 @@ export default function CheckInChat() {
 
   useEffect(() => {
     // Initial AI message
-    if (currentCheckIn.messages.length === 0) {
+    if (currentCheckIn && currentCheckIn.messages.length === 0) {
       setTimeout(() => {
         addMessage('ai', getAIResponse(0));
       }, 500);
     }
-  }, []);
+  }, [currentCheckIn]);
 
   useEffect(() => {
-    scrollRef.current?.scrollToEnd({ animated: true });
-  }, [currentCheckIn.messages]);
+    if (currentCheckIn) {
+      scrollRef.current?.scrollToEnd({ animated: true });
+    }
+  }, [currentCheckIn?.messages]);
+
+  // Redirect if no user or check-in (must be in useEffect, not during render)
+  useEffect(() => {
+    if (!user || !currentCheckIn) {
+      router.replace('/checkin');
+    }
+  }, [user, currentCheckIn, router]);
+
+  // Early return AFTER all hooks
+  if (!user || !currentCheckIn) {
+    return null;
+  }
 
   const handleSend = () => {
     if (!inputText.trim()) return;
@@ -88,7 +99,7 @@ export default function CheckInChat() {
     setTimeout(() => {
       addMessage('ai', getAIResponse(nextStep, inputText.trim()));
 
-      if (nextStep >= 2) {
+      if (nextStep >= 2 && tone && foodInfo) {
         // Set feedback and go to result
         setFeedback({
           constitution: `${user.constitution} 체질에 맞는 조언: ${foodInfo.description}`,
@@ -104,6 +115,7 @@ export default function CheckInChat() {
   };
 
   const handleSkip = () => {
+    if (!tone || !foodInfo) return;
     setFeedback({
       constitution: `${user.constitution} 체질 조언: ${foodInfo.description}`,
       saju: '오늘 하루도 건강하세요!',
