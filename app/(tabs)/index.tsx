@@ -14,13 +14,14 @@ export default function HomeScreen() {
   const router = useRouter();
   const { user } = useUserStore();
   const { getTodayCheckIn, getStreak } = useCheckInStore();
-  const { getTodayRoutine } = useRoutineStore();
 
   if (!user) return null;
 
   const todayCheckIn = getTodayCheckIn(user.id);
   const streak = getStreak(user.id);
-  const routine = getTodayRoutine(user.id, user.constitution);
+  const routine = useRoutineStore((state) =>
+    state.ensureTodayRoutine(user.id, user.constitution)
+  );
   const tone = getMBTITone(user.mbti as any);
   const foodInfo = FOODS_BY_CONSTITUTION[user.constitution];
 

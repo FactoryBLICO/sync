@@ -7,11 +7,11 @@ import { RoutineCard } from '../../components/cards/RoutineCard';
 
 export default function RoutineScreen() {
   const { user } = useUserStore();
-  const { getTodayRoutine, toggleTask, checkAndAwardBadges, badges } = useRoutineStore();
+  const { ensureTodayRoutine, toggleTask, checkAndAwardBadges, badges } = useRoutineStore();
 
   if (!user) return null;
 
-  const routine = getTodayRoutine(user.id, user.constitution);
+  const routine = ensureTodayRoutine(user.id, user.constitution);
 
   const handleToggleTask = (taskId: number) => {
     toggleTask(routine.id, taskId);

@@ -9,11 +9,14 @@ interface RoutineState {
   routines: Routine[];
   badges: Badge[];
 
-  // Actions
-  getTodayRoutine: (userId: string, constitution: ConstitutionType) => Routine;
-  toggleTask: (routineId: string, taskId: number) => void;
+  // Getters (read-only, no set() calls)
+  getTodayRoutine: (userId: string) => Routine | undefined;
   getCompletionRate: (routineId: string) => number;
   getRoutineHistory: (userId: string) => Routine[];
+
+  // Actions (can modify state)
+  ensureTodayRoutine: (userId: string, constitution: ConstitutionType) => Routine;
+  toggleTask: (routineId: string, taskId: number) => void;
   checkAndAwardBadges: (userId: string) => Badge[];
 }
 
@@ -23,11 +26,16 @@ export const useRoutineStore = create<RoutineState>()(
       routines: [],
       badges: [],
 
-      getTodayRoutine: (userId, constitution) => {
+      getTodayRoutine: (userId) => {
         const today = new Date().toISOString().split('T')[0];
-        const { routines } = get();
+        return get().routines.find(
+          (r) => r.userId === userId && r.date === today
+        );
+      },
 
-        let todayRoutine = routines.find(
+      ensureTodayRoutine: (userId, constitution) => {
+        const today = new Date().toISOString().split('T')[0];
+        let todayRoutine = get().routines.find(
           (r) => r.userId === userId && r.date === today
         );
 
