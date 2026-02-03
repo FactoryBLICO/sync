@@ -3,6 +3,7 @@
     "name": "sync",
     "slug": "sync",
     "version": "1.0.0",
+    "scheme": "sync",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
