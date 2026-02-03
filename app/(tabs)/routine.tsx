@@ -7,11 +7,31 @@ import { RoutineCard } from '../../components/cards/RoutineCard';
 
 export default function RoutineScreen() {
   const { user } = useUserStore();
-  const { ensureTodayRoutine, toggleTask, checkAndAwardBadges, badges } = useRoutineStore();
+
+  // Separate actions from state
+  const ensureTodayRoutine = useRoutineStore((state) => state.ensureTodayRoutine);
+  const routine = useRoutineStore((state) => state.getTodayRoutine(user?.id ?? ''));
+  const toggleTask = useRoutineStore((state) => state.toggleTask);
+  const checkAndAwardBadges = useRoutineStore((state) => state.checkAndAwardBadges);
+  const badges = useRoutineStore((state) => state.badges);
+
+  // Move side effect to useEffect
+  useEffect(() => {
+    if (user) {
+      ensureTodayRoutine(user.id, user.constitution);
+    }
+  }, [user?.id, user?.constitution, ensureTodayRoutine]);
 
   if (!user) return null;
 
-  const routine = ensureTodayRoutine(user.id, user.constitution);
+  // Show loading state if routine not ready
+  if (!routine) {
+    return (
+      <SafeAreaView className="flex-1 bg-gray-50 items-center justify-center">
+        <Text>로딩 중...</Text>
+      </SafeAreaView>
+    );
+  }
 
   const handleToggleTask = (taskId: number) => {
     toggleTask(routine.id, taskId);

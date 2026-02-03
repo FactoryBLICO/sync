@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -15,15 +15,32 @@ export default function HomeScreen() {
   const { user } = useUserStore();
   const { getTodayCheckIn, getStreak } = useCheckInStore();
 
+  // Separate action from state
+  const ensureTodayRoutine = useRoutineStore((state) => state.ensureTodayRoutine);
+  const routine = useRoutineStore((state) => state.getTodayRoutine(user?.id ?? ''));
+
+  // Move side effect to useEffect
+  useEffect(() => {
+    if (user) {
+      ensureTodayRoutine(user.id, user.constitution);
+    }
+  }, [user?.id, user?.constitution, ensureTodayRoutine]);
+
   if (!user) return null;
 
   const todayCheckIn = getTodayCheckIn(user.id);
   const streak = getStreak(user.id);
-  const routine = useRoutineStore((state) =>
-    state.ensureTodayRoutine(user.id, user.constitution)
-  );
   const tone = getMBTITone(user.mbti as any);
   const foodInfo = FOODS_BY_CONSTITUTION[user.constitution];
+
+  // Show loading state if routine not ready
+  if (!routine) {
+    return (
+      <SafeAreaView className="flex-1 bg-gray-50 items-center justify-center">
+        <Text>로딩 중...</Text>
+      </SafeAreaView>
+    );
+  }
 
   const handleStartCheckIn = () => {
     router.push('/checkin');
