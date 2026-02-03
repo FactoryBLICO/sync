@@ -1,7 +1,15 @@
 import React from 'react';
-import { Stack } from 'expo-router';
+import { Stack, Redirect } from 'expo-router';
+import { useUserStore } from '../../stores/userStore';
 
 export default function OnboardingLayout() {
+  const isOnboardingComplete = useUserStore((state) => state.isOnboardingComplete);
+
+  // Redirect to tabs if onboarding is already completed
+  if (isOnboardingComplete) {
+    return <Redirect href="/(tabs)" />;
+  }
+
   return (
     <Stack
       screenOptions={{

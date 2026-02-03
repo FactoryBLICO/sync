@@ -1,9 +1,16 @@
 import React from 'react';
-import { Tabs } from 'expo-router';
+import { Tabs, Redirect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { View } from 'react-native';
+import { useUserStore } from '../../stores/userStore';
 
 export default function TabLayout() {
+  const isOnboardingComplete = useUserStore((state) => state.isOnboardingComplete);
+
+  // Redirect to onboarding if not completed
+  if (!isOnboardingComplete) {
+    return <Redirect href="/onboarding" />;
+  }
+
   return (
     <Tabs
       screenOptions={{
